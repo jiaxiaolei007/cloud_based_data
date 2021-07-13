@@ -40,7 +40,7 @@
           </Sider>
           <Layout :style="{ padding: '0 24px 24px' }">
             <div>
-              <router-link to="/taskType"></router-link>
+              <router-link to="/taskType"> </router-link>
               <router-link to="/basicConfig"></router-link>
               <router-link to="/sourceAndTargetConfig"></router-link>
               <router-link to="/taskConfig"></router-link>
@@ -50,10 +50,10 @@
             <keep-alive>
               <router-view></router-view>
             </keep-alive>
-            <!-- <task-type></task-type> -->
+            <!-- <task-type ref='taskType'></task-type> -->
           </Layout>
         </Layout>
-        <Footer style="background: #fff">
+        <!-- <Footer style="background: #fff">
           <div
             style="margin-left: 155px; padding: 20px"
             v-if="isShowTaskManage"
@@ -212,7 +212,7 @@
               </div>
             </Modal>
           </div>
-        </Footer>
+        </Footer> -->
       </Layout>
     </div>
   </div>
@@ -228,7 +228,8 @@ const sourceAndTargetConfig = () =>
 const taskConfig = () => import("./components/DS/taskConfig.vue");
 const processValidation = () => import("./components/DS/processValidation.vue");
 const taskManage = () => import("./components/DS/taskManage.vue");
-import axios from 'axios'
+import axios from "axios";
+import emitter from "./js/eventbus";
 
 export default {
   data() {
@@ -244,6 +245,7 @@ export default {
         "/sourceAndTargetConfig",
         "/taskConfig",
         "/processValidation",
+        "/taskManage",
       ],
     };
   },
@@ -264,35 +266,22 @@ export default {
     taskManage,
   },
   methods: {
-    next() {
-      this.currentObj.current += 1;
-      this.lastShow = true;
-      this.$router.push(this.assList[this.currentObj.current]);
-      // 保存状态信息到sessionStorage
-      if (this.currentObj.current <= 4) {
-        sessionStorage.setItem(
-          "currentObj.current",
-          JSON.stringify(this.currentObj.current)
-        );
-      }
-      if (this.currentObj.current == 4) {
-        this.nextShow = false;
-      }
+    next(current) {
+      // console.log(this.$refs.taskType.current);
+      // console.log(this.$refs.taskType.current)
+      // this.currentObj.current += 1;
+      // this.lastShow = true;
+      this.$router.push(this.assList[current]);
       // console.log(this.currentObj.current, this.assList[this.currentObj.current]);
+      // console.log('lll')
     },
-    last() {
-      this.currentObj.current -= 1;
-      this.nextShow = true;
-      this.$router.push(this.assList[this.currentObj.current]);
-      if (this.currentObj.current >= 0) {
-        sessionStorage.setItem(
-          "currentObj.current",
-          JSON.stringify(this.currentObj.current)
-        );
-      }
-      if (this.currentObj.current == 0) {
-        this.lastShow = false;
-      }
+    last(current) {
+      // this.currentObj.current -= 1;
+      // this.nextShow = true;
+      this.$router.push(this.assList[current]);
+      // if (this.currentObj.current == 0) {
+      //   this.lastShow = false;
+      // }
     },
     cancel() {
       this.$router.push("/taskManage");
@@ -315,73 +304,57 @@ export default {
     //   this.currentObj.current -= 1;
     //   console.log(this.currentObj.current);
     // },
-    establishTask(){
-      this.isShowTaskManage=true
-    }
+    establishTask() {
+      this.isShowTaskManage = true;
+    },
   },
   watch: {
+    // 监控浏览器原生按钮的进退
     $route(to, from) {
       var array = sessionStorage.getItem("hrefArray").split(",");
       console.log(array.indexOf(to.fullPath) == array.indexOf(from.fullPath));
+      // console.log("kkkkkkk", this.current);
       if (array.indexOf(to.fullPath) > array.indexOf(from.fullPath)) {
         this.currentObj.current = array.indexOf(to.fullPath);
+        this.$store.state.current = this.currentObj.current;
         console.log("goon", this.currentObj.current);
-        this.$router.push(this.assList[this.currentObj.current]);
-        if (this.currentObj.current == 4) {
-          this.lastShow = true;
-          this.nextShow = false;
-        }else if(this.currentObj.current>=5){
-          this.isShowTaskManage=false;
-        }
+        // this.$router.push(this.assList[this.currentObj.current]);
       } else {
-        this.establishTask()
+        this.establishTask();
         this.currentObj.current = array.indexOf(to.fullPath);
+        this.$store.state.current = this.currentObj.current;
         console.log("goback", this.currentObj.current);
-        this.$router.push(this.assList[this.currentObj.current]);
-        if (this.currentObj.current !== 4) {
-          this.lastShow = true;
-          this.nextShow = true;
-        }
-        if (this.currentObj.current == 0) {
-          this.nextShow = true;
-          this.lastShow = false;
-        }
-        if (this.currentObj.current == 4) {
-          this.nextShow = false;
-          this.lastShow = true;
-          this.isShowTaskManage=true
-        }
+        // this.$router.push(this.assList[this.currentObj.current]);
       }
     },
-  },
-  // 监听浏览器的回退按钮，监听到回退后执行goBack方法
-  // mounted() {
-  //   if (window.history && window.history.pushState) {
-  //     history.pushState(null, null, document.URL);
-  //     window.addEventListener("popstate", this.goBack, false);
-  //   }
-  // },
-  // destroyed() {
-  //   window.removeEventListener("popstate", this.goBack, false);
-  // },
-  created() {
-    // 在页面刷新时读取sessionStorage里的状态信息
-    // if (sessionStorage.getItem("currentObj.current")) {
-    //   this.currentObj.current = JSON.parse(
-    //     sessionStorage.getItem("currentObj.current")
-    //   );
-    //   console.log(this.currentObj.current);
-    //   if (this.currentObj.current == 4) {
-    //     this.nextShow = false;
-    //     this.lastShow = true;
+    "$store.state.current": {
+      handler(newName, oldName) {
+        console.log(this.$store.state.current);
+        if (newName > oldName) {
+          this.next(this.$store.state.current);
+        } else {
+          this.last(this.$store.state.current);
+        }
+      },
+      immediate: true,
+    },
+    // 监听浏览器的回退按钮，监听到回退后执行goBack方法
+    // mounted() {
+    //   if (window.history && window.history.pushState) {
+    //     history.pushState(null, null, document.URL);
+    //     window.addEventListener("popstate", this.goBack, false);
     //   }
-    //   if (this.currentObj.current < 4) {
-    //     this.lastShow = true;
-    //   }
-    //   if (this.currentObj.current == 0) {
-    //     this.lastShow = false;
-    //   }
-    // }
+    // },
+    // destroyed() {
+    //   window.removeEventListener("popstate", this.goBack, false);
+    // },
+    created() {
+      // this.currentObj.current=this.$store.state.current
+      // emitter.on("basicConfig", (info) => {
+      //   this.next(info);
+      //   console.log("lll");
+      // });
+    },
   },
 };
 </script>

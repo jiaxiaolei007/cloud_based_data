@@ -21,6 +21,7 @@
       </Steps>
     </Layout>
   </div>
+  
 </template>
 
 <script>

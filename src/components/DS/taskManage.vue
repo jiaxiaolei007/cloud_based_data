@@ -32,116 +32,122 @@
                     border: 0.8px solid #e5e5e5;
                   "
                 >
-                  <Row>
-                    <Col span="7" style="margin: 10px"
-                      >任务名称
-                      <input
-                        type="text"
-                        placeholder="请输入..."
-                        style="
-                          width: 230px;
-                          height: 30px;
-                          margin-left: 10px;
-                          border: 1px solid #bbbbbb;
-                          padding: 8px;
-                        "
-                      />
-                    </Col>
-                    <Col span="7" style="margin: 10px"
-                      >任务ID
-                      <input
-                        type="text"
-                        placeholder="请输入..."
-                        style="
-                          width: 230px;
-                          height: 30px;
-                          margin-left: 10px;
-                          border: 1px solid #bbbbbb;
-                          padding: 8px;
-                        "
-                      />
-                    </Col>
-                    <Col span="" style="margin: 10px"
-                      >调度状态
-                      <Select
-                        v-model="model1"
-                        style="width: 280px; margin-left: 20px"
-                      >
-                        <Option
-                          v-for="item in cityList1"
-                          :value="item.value"
-                          :key="item.value"
-                          >{{ item.label }}</Option
+                  <Form
+                    ref="formValidate"
+                    :model="formValidate"
+                    :rules="ruleValidate"
+                    :label-width="80"
+                  >
+                    <Row>
+                      <Col span="7" style="margin: 10px">
+                        <FormItem label="任务名称" prop="name">
+                          <input
+                            v-model="formValidate.name"
+                            type="text"
+                            placeholder="请输入..."
+                            class="input"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span="7" style="margin: 10px">
+                        <FormItem label="任务ID" prop="ID">
+                          <input
+                            v-model="formValidate.ID"
+                            type="text"
+                            placeholder="请输入..."
+                            class="input"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span="" style="margin: 10px">
+                        <FormItem label="任务状态" prop="state">
+                          <Select
+                            v-model="formValidate.state"
+                            placeholder="选择状态"
+                            style="width: 230px"
+                          >
+                            <Option value="openAsync">开启同步</Option>
+                            <Option value="closeAsync">停止同步</Option>
+                          </Select>
+                        </FormItem>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span="7" style="margin: 0px 10px 10px 10px">
+                        <FormItem label="创建人" prop="founder">
+                          <input
+                            v-model="formValidate.founder"
+                            type="text"
+                            placeholder="请输入..."
+                            class="input"
+                          />
+                        </FormItem>
+                      </Col>
+                      <Col span="7" style="margin: 0px 10px 10px 10px">
+                        <FormItem label="任务类型" prop="type">
+                          <Select
+                            v-model="formValidate.type"
+                            placeholder="选择类型"
+                            style="width: 230px"
+                          >
+                            <Option value="async1">关系型数据库实时同步</Option>
+                            <Option value="async2">关系型数据库全量同步</Option>
+                            <Option value="async3">消息队列实时同步</Option>
+                          </Select>
+                        </FormItem>
+                      </Col>
+                      <Col style="margin: 0px 10px 10px 10px" v-if="!showAttr">
+                        <FormItem label="创建时间" prop="date">
+                          <DatePicker
+                            v-model="formValidate.date"
+                            type="datetimerange"
+                            format="yyyy-MM-dd HH:mm"
+                            placeholder="选择日期和时间"
+                            style="width: 230px; margin-left: 20px"
+                          ></DatePicker>
+                        </FormItem>
+                      </Col>
+                      <Col span="" style="margin: 0px 10px 10px 10px">
+                        <Button
+                          type="primary"
+                          style="margin-left: 10px"
+                          @click="handleSubmit('formValidate')"
+                          >查询</Button
                         >
-                      </Select>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span="7" style="margin: 10px 10px 10px 24px"
-                      >创建人
-                      <input
-                        type="text"
-                        placeholder="请输入..."
-                        style="
-                          width: 230px;
-                          height: 30px;
-                          margin-left: 10px;
-                          border: 1px solid #bbbbbb;
-                          padding: 8px;
-                        "
-                      />
-                    </Col>
-                    <Col span="7" style="margin: 10px 10px 10px -20px"
-                      >任务类型
-                      <Select
-                        v-model="model2"
-                        style="width: 230px; margin-left: 12px"
-                      >
-                        <Option
-                          v-for="item in cityList2"
-                          :value="item.value"
-                          :key="item.value"
-                          >{{ item.label }}</Option
+                        <Button
+                          style="margin-left: 10px"
+                          @click="handleReset('formValidate')"
+                          >重置</Button
                         >
-                      </Select>
-                    </Col>
-                    <Col style="margin: 10px 10px 10px 28px" v-if="!showAttr">
-                      创建时间<DatePicker
-                        type="datetimerange"
-                        format="yyyy-MM-dd HH:mm"
-                        placeholder="选择日期和时间"
-                        style="width: 300px; margin-left: 24px"
-                      ></DatePicker>
-                    </Col>
-                    <Col span="" style="margin: 10px 10px 10px 20px">
-                      <Button type="primary" style="margin-left: 10px"
-                        >查询</Button
-                      >
-                      <Button style="margin-left: 10px">重置</Button>
-                      <span
-                        style="
-                          color: #337dff;
-                          cursor: pointer;
-                          margin-left: 10px;
-                        "
-                        @click="showBtn"
-                        v-if="showAttr"
-                        >展开
-                        <Icon type="ios-arrow-down" size="16" color="#337DFF" />
-                      </span>
-                      <span
-                        style="
-                          color: #337dff;
-                          cursor: pointer;
-                          margin-left: 10px;
-                        "
-                        @click="showBtn"
-                        v-if="!showAttr"
-                        >收起
-                        <Icon type="ios-arrow-up" size="16" color="#337DFF" />
-                      </span>
-                    </Col>
-                  </Row>
+                        <span
+                          style="
+                            color: #337dff;
+                            cursor: pointer;
+                            margin-left: 10px;
+                          "
+                          @click="showBtn"
+                          v-if="showAttr"
+                          >展开
+                          <Icon
+                            type="ios-arrow-down"
+                            size="16"
+                            color="#337DFF"
+                          />
+                        </span>
+                        <span
+                          style="
+                            color: #337dff;
+                            cursor: pointer;
+                            margin-left: 10px;
+                          "
+                          @click="showBtn"
+                          v-if="!showAttr"
+                          >收起
+                          <Icon type="ios-arrow-up" size="16" color="#337DFF" />
+                        </span>
+                      </Col>
+                    </Row>
+                  </Form>
                 </div>
                 <div style="margin: 20px 0px">
                   <Button
@@ -304,6 +310,15 @@ const dataSync = () => import("./dataSync.vue");
 export default {
   data() {
     return {
+      formValidate: {
+        name: "",
+        ID: "",
+        state: "",
+        founder: "",
+        date: "",
+        type: "",
+        desc: "",
+      },
       fieldName: [
         "taskName",
         "taskId",
@@ -313,41 +328,74 @@ export default {
         "founder",
         "createTime",
       ],
+      ruleValidate: {
+        name: [
+          {
+            required: true,
+            message: "任务名称不可为空",
+            trigger: "blur",
+          },
+        ],
+        ID: [
+          {
+            required: false,
+            message: "任务ID不可为空",
+            trigger: "blur",
+          },
+          { type: "email", message: "Incorrect email format", trigger: "blur" },
+        ],
+        state: [
+          {
+            required: true,
+            message: "请选择调度状态",
+            trigger: "change",
+          },
+        ],
+        founder: [
+          {
+            required: true,
+            message: "创建人不可为空",
+            trigger: "blur",
+          },
+        ],
+        date: [
+          {
+            required: false,
+            type: "date",
+            message: "请选择日期",
+            trigger: "change",
+          },
+        ],
+        type: [
+          {
+            required: true,
+            type: "string",
+            message: "请选择类型",
+            trigger: "change",
+          },
+        ],
+      },
       data: "",
       showAttr: true,
       isActive: true,
-      cityList1: [
-        {
-          value: "开启同步",
-          label: "开启同步",
-        },
-        {
-          value: "停止同步",
-          label: "停止同步",
-        },
-      ],
-      model2: "",
-      cityList2: [
-        {
-          value: "关系型数据库全量同步",
-          label: "关系型数据库全量同步",
-        },
-        {
-          value: "关系型数据库实时同步",
-          label: "关系型数据库实时同步",
-        },
-        {
-          value: "消息队列实时同步",
-          label: "消息队列实时同步",
-        },
-      ],
-      model1: "",
     };
   },
   components: {
     dataSync,
   },
   methods: {
+    handleSubmit(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          this.$Message.success("查询成功!");
+        } else {
+          this.$Message.error("查询失败！");
+        }
+      });
+    },
+    handleReset(name) {
+      this.$refs[name].resetFields();
+    },
     btnChange(index, state) {
       console.log("向后端请求状态改变");
       if (state == 1) {
@@ -416,7 +464,7 @@ export default {
         data[i]["isShow"] = false;
         data[i]["isCheck"] = false;
       }
-      this.data=data
+      this.data = data;
       console.log(this.data);
     },
   },
@@ -442,5 +490,11 @@ export default {
 }
 .operation_btn:hover {
   background-color: #e9ebef;
+}
+.input {
+  width: 230px;
+  height: 30px;
+  border: 1px solid #bbbbbb;
+  padding: 8px;
 }
 </style>

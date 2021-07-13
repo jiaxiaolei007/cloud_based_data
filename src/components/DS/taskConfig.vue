@@ -9,91 +9,99 @@
           background: '#fff',
         }"
       >
-        <div class="title1">
-          <div
-            style="
-              float: left;
-              width: 120px;
-              text-align: right;
-              margin-top: 8px;
-            "
+        <Form
+          ref="formValidate"
+          :model="formValidate"
+          :rules="ruleValidate"
+          :label-width="80"
+          style="margin-left: -80px"
+        >
+          <FormItem
+            prop="mode"
+            label="调度方式"
+            label-position="right"
+            :label-width="200"
           >
-            <span style="color: red">*</span> 调度方式
-          </div>
-          <div style="width: 160px; height: 35px; margin-left: 140px">
-            <Button class="table_button_left" :class="{ active: active }"
-              >单次</Button
-            >
-            <Button class="table_button_right" :class="{ active: !active }"
-              >周期</Button
-            >
-          </div>
-        </div>
-        <div v-if="!active">
-          <div class="title1">
+            <div>
+              <div style="width: 200px; height: 35px; margin-left: 20px">
+                <RadioGroup v-model="formValidate.mode" type="button">
+                  <Radio class="radio_button" label="单次">单次</Radio>
+                  <Radio class="radio_button" label="周期">周期</Radio>
+                </RadioGroup>
+              </div>
+            </div>
+          </FormItem>
+          <FormItem
+            prop="date"
+            label="开始执行时间"
+            label-position="right"
+            :label-width="200"
+          >
+            <DatePicker
+              type="datetime"
+              placeholder="选择时间和日期"
+              v-model="formValidate.date"
+              style="width: 300px; margin: 2px 0 0 20px"
+            ></DatePicker>
+          </FormItem>
+          <div style="height: 35px">
             <div
               style="
                 float: left;
                 width: 120px;
                 text-align: right;
-                margin-top: 8px;
+                margin-left: 86px;
               "
             >
-              <span style="color: red">*</span> 开始执行时间
+              <div v-if="showAttr">
+                <span style="color: #337dff; cursor: pointer" @click="showBtn"
+                  >显示高级属性
+                </span>
+                <Icon type="ios-arrow-down" size="16" color="#337DFF" />
+              </div>
+              <div v-if="!showAttr">
+                <span style="color: #337dff; cursor: pointer" @click="showBtn"
+                  >隐藏高级属性
+                </span>
+                <Icon type="ios-arrow-up" size="16" color="#337DFF" />
+              </div>
             </div>
-            <DatePicker
-              type="datetime"
-              placeholder="选择时间和日期"
-              style="width: 200px; margin: 2px 0 0 20px"
-            ></DatePicker>
           </div>
-        </div>
-        <div class="title1" style="height: 35px">
-          <div
-            style="
-              float: left;
-              width: 120px;
-              text-align: right;
-              margin-top: 8px;
-            "
+          <FormItem
+            prop="number"
+            label="任务并发数"
+            label-position="right"
+            :label-width="200"
+            v-if="!showAttr"
           >
-            <div v-if="showAttr">
-              <span style="color: #337dff; cursor: pointer" @click="showBtn"
-                >显示高级属性
-              </span>
-              <Icon type="ios-arrow-down" size="16" color="#337DFF" />
+            <div>
+              <input
+                type="text"
+                style="
+                  width: 400px;
+                  height: 35px;
+                  margin-left: 20px;
+                  border: 1px solid #bbbbbb;
+                  padding: 8px;
+                "
+                v-model="formValidate.number"
+                placeholder="请输入正整数"
+              />
             </div>
-            <div v-if="!showAttr">
-              <span style="color: #337dff; cursor: pointer" @click="showBtn"
-                >隐藏高级属性
-              </span>
-              <Icon type="ios-arrow-up" size="16" color="#337DFF" />
-            </div>
-          </div>
-        </div>
-        <div class="title1" v-if="!showAttr">
-          <div
-            style="
-              float: left;
-              width: 120px;
-              text-align: right;
-              margin-top: 8px;
-            "
+          </FormItem>
+          <FormItem>
+            <div style="padding: 20px; margin: 236px 0px -21px -20px">
+              <Button type="default" class="btn_margin">取消</Button>
+              <Button @click="last" class="btn_margin">上一步</Button>
+              <Button
+                type="primary"
+                @click="handleSubmit('formValidate')"
+                class="btn_margin"
+                >下一步</Button
+              >
+            </div></FormItem
           >
-            任务并发数
-          </div>
-          <input
-            type="text"
-            style="
-              width: 400px;
-              height: 35px;
-              margin-left: 20px;
-              border: 1px solid #bbbbbb;
-              padding: 8px;
-            "
-            placeholder="请输入正整数"
-          />
-        </div>
+        </Form>
       </Content>
     </Layout>
   </div>
@@ -107,11 +115,59 @@ export default {
     return {
       showAttr: true,
       active: true,
+      formValidate: {
+        mode: "",
+        date: "",
+        number: "",
+      },
+      ruleValidate: {
+        mode: [
+          {
+            required: true,
+            message: "请选择调度方式",
+            trigger: "change",
+          },
+        ],
+        date: [
+          {
+            required: true,
+            type: "date",
+            message: "请选择开始时间",
+            trigger: "change",
+          },
+        ],
+        number: [
+          {
+            required: false,
+            message: "",
+            trigger: "change",
+          },
+        ],
+      },
     };
   },
   methods: {
     showBtn() {
       this.showAttr = !this.showAttr;
+    },
+    handleSubmit(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          this.$Message.success("成功!");
+          this.$store.state.current++;
+          console.log(this.$store.state.current);
+          // emitter.emit("basicConfig", this.current);
+          sessionStorage.setItem("dispatchmode", this.formValidate.mode);
+          sessionStorage.setItem("executionTime", this.formValidate.date);
+          sessionStorage.setItem("taskNumber", this.formValidate.number);
+        } else {
+          this.$Message.error("失败!");
+        }
+      });
+    },
+    last() {
+      this.$store.state.current--;
+      console.log(this.$store.state.current);
     },
   },
   components: {
@@ -121,21 +177,11 @@ export default {
 </script>
 
 <style scoped>
-.title1 {
-  margin: 20px;
-  color: #333333;
-}
-
-.table_button_left {
+.radio_button {
   width: 80px;
+  height: 36px;
   text-align: center;
-  line-height: 35px;
-  font-size: 12px;
-}
-.table_button_right {
-  text-align: center;
-  width: 80px;
-  line-height: 35px;
-  font-size: 12px;
+  line-height: 36px;
+  font-size: 13px;
 }
 </style>
