@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-const taskType = () => import('../components/DS/taskType.vue')
-const basicConfig = () => import('../components/DS/basicConfig.vue')
-const sourceAndTargetConfig = () => import('../components/DS/sourceAndTargetConfig.vue')
-const taskConfig = () => import('../components/DS/taskConfig.vue')
-const processValidation = () => import('../components/DS/processValidation.vue')
-const taskManage = () => import('../components/DS/taskManage.vue')
-const dataSync=()=>import('../components/DS/dataSync.vue')
+const taskType = () => import('../components/DS/TaskType')
+const basicConfig = () => import('../components/DS/BasicConfig')
+const sourceAndTargetConfig = () => import('../components/DS/SourceAndTargetConfig')
+const taskConfig = () => import('../components/DS/TaskConfig')
+const processValidation = () => import('../components/DS/ProcessValidation')
+const taskManage = () => import('../components/DS/TaskManage')
+const dataSync=()=>import('../components/DS/DataSync')
 
 Vue.use(VueRouter)
 // 解决导航栏或者底部导航tabBar中的vue-router在3.0版本以上频繁点击菜单报错的问题。

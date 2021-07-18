@@ -1,7 +1,7 @@
 <template >
   <div style="font-size: 12px">
     <Layout>
-      <bread-crumb></bread-crumb>
+      <!-- <bread-crumb></bread-crumb>
       <Content
         :style="{
           padding: '24px',
@@ -14,7 +14,7 @@
           :model="formValidate"
           :rules="ruleValidate"
           :label-width="80"
-          style="margin-left: -80px"
+          style="margin-left: -80px;margin-top: 30px"
         >
           <FormItem
             prop="taskName"
@@ -24,16 +24,9 @@
           >
             <div>
               <div>
-                <input
-                  type="text"
+                <Input
                   placeholder="请输入..."
-                  style="
-                    width: 450px;
-                    height: 30px;
-                    padding: 10px;
-                    border: 1px solid #bbbbbb;
-                  "
-                  class="myinput"
+                  style="width: 450px; height: 35px"
                   v-model="formValidate.taskName"
                 />
                 <div class="description">
@@ -49,20 +42,17 @@
             :label-width="200"
           >
             <div>
-              <textarea
+              <Input
+                type="textarea"
                 v-model="formValidate.taskDesc"
                 placeholder="不超过250个字符"
-                style="
-                  width: 450px;
-                  height: 120px;
-                  resize: none;
-                  padding: 10px;
-                  border: 1px solid #bbbbbb;
-                "
-              ></textarea></div
+                style="width: 450px"
+                :rows="4"
+                :show-word-limit=true
+              ></Input></div
           ></FormItem>
           <FormItem>
-            <div style="padding: 20px; margin: 236px 0px -21px -20px">
+            <div style="padding: 20px; margin-top: 156px">
               <Button type="default" class="btn_margin">取消</Button>
               <Button @click="last" class="btn_margin">上一步</Button>
               <Button
@@ -74,17 +64,90 @@
             </div></FormItem
           >
         </Form>
-      </Content>
+      </Content> -->
+      <common-component>
+        <template v-slot:body>
+          <steps>
+            <template v-slot:content>
+              <Content
+                :style="{
+                  padding: '24px',
+                  minHeight: '280px',
+                  background: '#fff',
+                }"
+              >
+                <Form
+                  ref="formValidate"
+                  :model="formValidate"
+                  :rules="ruleValidate"
+                  :label-width="80"
+                  style="margin-left: -80px; margin-top: 30px"
+                >
+                  <FormItem
+                    prop="taskName"
+                    label="任务名称"
+                    label-position="right"
+                    :label-width="200"
+                  >
+                    <div>
+                      <div>
+                        <Input
+                          placeholder="请输入..."
+                          style="width: 450px; height: 35px"
+                          v-model="formValidate.taskName"
+                        />
+                        <div class="description">
+                          仅允许中文、字母开头，长度限制1～64个字符，可包含中文、字母、数字、中划线、下划线
+                        </div>
+                      </div>
+                    </div></FormItem
+                  >
+                  <FormItem
+                    prop="taskDesc"
+                    label="任务描述"
+                    label-position="right"
+                    :label-width="200"
+                  >
+                    <div>
+                      <Input
+                        type="textarea"
+                        v-model="formValidate.taskDesc"
+                        placeholder="不超过250个字符"
+                        style="width: 450px"
+                        :rows="4"
+                        :show-word-limit="true"
+                      ></Input></div
+                  ></FormItem>
+                </Form>
+              </Content>
+            </template>
+            <template v-slot:button>
+              <div style="padding: 20px; margin-top: 156px">
+                <Button type="default" class="btn_margin">取消</Button>
+                <Button @click="last" class="btn_margin">上一步</Button>
+                <Button
+                  type="primary"
+                  @click="handleSubmit('formValidate')"
+                  class="btn_margin"
+                  >下一步</Button
+                >
+              </div>
+            </template>
+          </steps>
+        </template>
+      </common-component>
     </Layout>
   </div>
 </template>
 
 <script>
-const breadCrumb = () => import("./breadCrumb.vue");
+const commonComponent = () => import("./CommonComponent");
+const steps = () => import("./Steps");
 
 export default {
   components: {
-    breadCrumb,
+    commonComponent,
+    steps,
   },
   data() {
     return {
@@ -97,6 +160,14 @@ export default {
           {
             required: true,
             message: "请输入任务名称",
+            trigger: "blur",
+          },
+          {
+            type: "string",
+            pattern:
+              /^[\u4E00-\u9FA5A-Za-z][\u4E00-\u9FA5a-zA-Z0-9_\\-]{1,64}$/,
+            message:
+              "格式不符合要求",
             trigger: "blur",
           },
         ],
@@ -120,19 +191,22 @@ export default {
     handleSubmit(name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.$Message.success("成功!");
-          this.$store.state.current++;
-          console.log(this.$store.state.current);
-          sessionStorage.setItem("taskName", this.formValidate.taskName);
-          sessionStorage.setItem("taskDesc", this.formValidate.taskDesc);
+          // this.$Message.success("成功!");
+          this.$store.commit("increment");
+          // console.log(this.$store.state.current);
+          // sessionStorage.setItem("taskName", this.formValidate.taskName);
+          // sessionStorage.setItem("taskDesc", this.formValidate.taskDesc);
+          this.$store.commit('taskNameInfo',this.formValidate.taskName)
+          this.$store.commit('taskDescInfo', this.formValidate.taskDesc)
+          console.log(this.$store.state.taskDesc)
         } else {
-          this.$Message.error("失败!");
+          // this.$Message.error("失败!");
         }
       });
     },
     last() {
-      this.$store.state.current--;
-      console.log(this.$store.state.current);
+      this.$store.commit("decrement");
+      // console.log(this.$store.state.current);
     },
   },
 };

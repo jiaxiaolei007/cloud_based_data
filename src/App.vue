@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="layout">
+    <div>
       <Layout
         style="position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px"
       >
@@ -218,18 +218,15 @@
   </div>
 </template>
 <script>
-const navBar = () => import("./components/DS/navBar.vue");
-const breadCrumb = () => import("./components/DS/breadCrumb.vue");
-const sider = () => import("./components/DS/sider.vue");
-const taskType = () => import("./components/DS/taskType.vue");
-const basicConfig = () => import("./components/DS/basicConfig.vue");
+const navBar = () => import("./components/DS/NavBar");
+const breadCrumb = () => import("./components/DS/BreadCrumb");
+const taskType = () => import("./components/DS/TaskType");
+const basicConfig = () => import("./components/DS/BasicConfig");
 const sourceAndTargetConfig = () =>
-  import("./components/DS/sourceAndTargetConfig.vue");
-const taskConfig = () => import("./components/DS/taskConfig.vue");
-const processValidation = () => import("./components/DS/processValidation.vue");
-const taskManage = () => import("./components/DS/taskManage.vue");
-import axios from "axios";
-import emitter from "./js/eventbus";
+  import("./components/DS/SourceAndTargetConfig");
+const taskConfig = () => import("./components/DS/TaskConfig");
+const processValidation = () => import("./components/DS/ProcessValidation");
+const taskManage = () => import("./components/DS/TaskManage");
 
 export default {
   data() {
@@ -257,7 +254,6 @@ export default {
   components: {
     navBar,
     breadCrumb,
-    sider,
     taskType,
     basicConfig,
     sourceAndTargetConfig,
@@ -312,7 +308,7 @@ export default {
     // 监控浏览器原生按钮的进退
     $route(to, from) {
       var array = sessionStorage.getItem("hrefArray").split(",");
-      console.log(array.indexOf(to.fullPath) == array.indexOf(from.fullPath));
+      // console.log(array.indexOf(to.fullPath) == array.indexOf(from.fullPath));
       // console.log("kkkkkkk", this.current);
       if (array.indexOf(to.fullPath) > array.indexOf(from.fullPath)) {
         this.currentObj.current = array.indexOf(to.fullPath);
@@ -348,13 +344,23 @@ export default {
     // destroyed() {
     //   window.removeEventListener("popstate", this.goBack, false);
     // },
-    created() {
-      // this.currentObj.current=this.$store.state.current
-      // emitter.on("basicConfig", (info) => {
-      //   this.next(info);
-      //   console.log("lll");
-      // });
-    },
+  },
+  created() {
+    // 在页面加载时读取sessionStorage
+    // console.log(sessionStorage.getItem("store"));
+    if (sessionStorage.getItem("store")) {
+      this.$store.replaceState(
+        Object.assign(
+          {},
+          this.$store.state,
+          JSON.parse(sessionStorage.getItem("store"))
+        )
+      );
+    }
+    // 在页面刷新时将store保存到sessionStorage里
+    window.addEventListener("beforeunload", () => {
+      sessionStorage.setItem("store", JSON.stringify(this.$store.state));
+    });
   },
 };
 </script>

@@ -12,17 +12,17 @@
       "
     >
       <Col span="9"
-        ><input
+        ><Input
           type="text"
-          style="width: 200px; border: 1px solid #bbbbbb"
+          style="width: 200px;"
           v-model="field"
           @blur="onblur1"
         />
       </Col>
       <Col span="9"
-        ><input
+        ><Input
           type="text"
-          style="width: 200px; border: 1px solid #bbbbbb"
+          style="width: 200px;"
           v-model="value"
           @blur="onblur2"
       /></Col>
@@ -50,14 +50,14 @@ export default {
       this.$emit("deleteInfo");
     },
     onblur1() {
-      this.fieldList.push(this.field);
-      console.log(this.fieldList)
-      sessionStorage.setItem("fieldList", JSON.stringify(this.fieldList));
+      this.$store.state.fieldList.push(this.field);
+      console.log(this.$store.state.fieldList)
+      // sessionStorage.setItem("fieldList", JSON.stringify(this.$store.state.fieldList));
     },
     onblur2() {
-      this.valueList.push(this.value);
-      console.log(this.valueList)
-      sessionStorage.setItem("valueList", JSON.stringify(this.valueList));
+      this.$store.state.valueList.push(this.value);
+      console.log(this.$store.state.valueList)
+      // sessionStorage.setItem("valueList", JSON.stringify(this.$store.state.valueList));
     },
   },
   // watch: {

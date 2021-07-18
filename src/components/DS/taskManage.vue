@@ -304,8 +304,8 @@
 
 <script>
 // import axios from "axios";
-import { request } from "../../js/request";
-const dataSync = () => import("./dataSync.vue");
+import { request } from "../../utils/request";
+const dataSync = () => import("./DataSync");
 
 export default {
   data() {
@@ -425,8 +425,6 @@ export default {
     },
     showBtn() {
       this.showAttr = !this.showAttr;
-      // console.log(this.$refs.button.$el.style.marginLeft);
-      // this.$refs.button.$el.style.marginLeft = "1000px";
     },
     establishTask() {
       this.$router.push("./taskType");
